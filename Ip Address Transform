@@ -1,0 +1,109 @@
+////////////////////////////////////////////////
+/// To modify some features of the program   ///
+////////////////////////////////////////////////
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *inetaddr_int_str(unsigned int);
+unsigned int inetaddr_str_int(char *const);
+int check_error;//To check
+int check_number;
+
+int main()
+{
+    unsigned int inet_addr_int;
+    char inet_addr_str[20];
+    char *inet_addr_str_convert=NULL;
+    check_error = 0;
+    printf("input internet address.\n");
+    scanf("%s",inet_addr_str);
+    inet_addr_int=inetaddr_str_int(inet_addr_str);
+    inet_addr_str_convert=inetaddr_int_str(inet_addr_int);
+    if(1==check_error)
+    {
+        printf("error");
+        return 0;
+    }
+    else
+    {
+        printf("internet address converted from string to digits:%#x\n",inet_addr_int);
+        printf("internet address converted from digits to string: %s \n",inet_addr_str_convert);
+    }
+    free(inet_addr_str_convert);
+    return 0;
+}
+
+unsigned int inetaddr_str_int(char *const inetaddrstr)
+{
+    int pos[4];
+    char byte[4][10];
+    unsigned char byte_int[4];
+    int i,j;
+    unsigned int result=0;
+    pos[0]=0;
+
+    for(i=0;*(inetaddrstr+i)!='\0';i++)
+    {
+        if (*(inetaddrstr+i)!='0'&&*(inetaddrstr+i)!='1'&&*(inetaddrstr+i)!='2'&&*(inetaddrstr+i)!='3'&&*(inetaddrstr+i)!='4'&&*(inetaddrstr+i)!='5'&&*(inetaddrstr+i)!='6'&&*(inetaddrstr+i)!='7'&&*(inetaddrstr+i)!='8'&&*(inetaddrstr+i)!='9'&&*(inetaddrstr+i)!='.'&&*(inetaddrstr)!='\0')
+        {
+            check_error = 1;
+            return 0;
+        }//input should be between 0x30 and 0x39 or be '.'   The request 1
+    }
+
+    for(i=0,j=1; *(inetaddrstr+i)!='\0'; i++)
+    {
+        if (*(inetaddrstr+i)=='.')
+        {
+            pos[j]=i+1;
+            *(inetaddrstr+i)='\0';
+            j++;
+        }
+    }
+
+    for (i=0,j=0; i<4; i++,j++)
+    {
+        strcpy(byte[i],inetaddrstr+pos[j]);
+        check_number = atoi(byte[i]);
+        byte_int[i]=(unsigned char)atoi(byte[i]);
+        if(0>check_number||check_number>255)
+        {
+            check_error = 1;
+            return 0;
+        }//address to transfer should be between 0 and 255  The request 2
+    }
+
+    for (i=0; i<4; i++)
+    {
+        result=result+(unsigned int)(byte_int[i]<<(8*(3-i)));
+    }
+    return result;
+}
+
+char *inetaddr_int_str(unsigned int inet_addr_int)
+{
+    int i,j;
+    unsigned char byte_int[4];
+    char byte[4][10];
+    char *inet_addr_string=malloc(20*sizeof(char));
+    memset(inet_addr_string,0,20*sizeof(char));
+    for(i=0; i<4; i++)
+    {
+        byte_int[i]=(unsigned char)(inet_addr_int>>8*(3-i));
+        itoa(byte_int[i],byte[i],10);
+    }
+    for(i=0; i<3; i++)
+    {
+        j=0;
+        while(*(byte[i]+j)!='\0')
+            j++;
+        *(byte[i]+j)='.';
+        *(byte[i]+j+1)='\0';
+    }
+    for(i=0; i<4; i++)
+    {
+        strcat(inet_addr_string,byte[i]);
+    }
+    return inet_addr_string;
+}
