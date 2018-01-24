@@ -1,5 +1,7 @@
---Collect coding problems from websites online
+# Code Problems Collections
 
---Keep refreshing if free
+-- Collect coding problems from websites online
 
---Step problems is simplied as a math problem
+-- Keep refreshing if free
+
+-- Step problems is simplied as a math problem
